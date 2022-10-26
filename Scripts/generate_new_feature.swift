@@ -47,8 +47,7 @@ func make_project_file(_ feature_name : String,_ file_path: String,_ has_demo : 
         product: .staticFramework,
         dependencies: [
             .Project.Features.CommonFeature,
-            \(dependencies.joined())
-        ]
+        ],
         \(has_demo ? "hasDemo: true" : "")
     )
     """
