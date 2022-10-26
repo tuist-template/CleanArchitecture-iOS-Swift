@@ -1,4 +1,4 @@
-#!/usr/bin/env swift
+#!/usr/bin/swift
 import Foundation
 
 func make_new_feature(_ feature_name : String,_ has_demo: Bool = false) {
