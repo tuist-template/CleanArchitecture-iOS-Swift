@@ -48,7 +48,7 @@ func make_project_file(_ feature_name : String,_ file_path: String,_ has_demo : 
         dependencies: [
             .Project.Features.CommonFeature,
         ],
-        \(has_demo ? "hasDemo: true" : "")
+        \(has_demo ? "hasDemoApp: true" : "")
     )
     """
     write_code_in_file(project_path, file_content)
