@@ -1,16 +1,15 @@
 #!/usr/bin/swift
 import Foundation
 
-func make_new_feature(_ feature_name : String,_ has_demo: Bool = false) {
-    make_dir("\(feature_name)Feature")
-    make_project_file(feature_name, "\(feature_name)Feature", has_demo)
-    make_sources(feature_name)
-    make_tests(feature_name)
+func make_new_project(_ project_name: String,_ has_demo: Bool = false) {
+    make_dir("\(project_name)")
+    make_project_file(project_name, project_name, has_demo)
+    make_sources(project_name)
+    make_tests(project_name)
     if has_demo {
-        make_demo(feature_name)
+        make_demo(project_name)
     }
 }
-
 func write_code_in_file(_ file_path: String,_ codes: String) {
     if let data: Data = codes.data(using: .utf8) {
         do {
@@ -20,7 +19,6 @@ func write_code_in_file(_ file_path: String,_ codes: String) {
         }
     }
 }
-
 func make_dir(_ path: String) {
     do {
         try fileManager.createDirectory(atPath: current_path+path, withIntermediateDirectories: false, attributes: nil)
@@ -28,14 +26,15 @@ func make_dir(_ path: String) {
         print("⚠️ Error - \(e.localizedDescription)")
     }
 }
-
 func make_dirs(_ paths: [String]) {
     paths.forEach{
         make_dir($0)
     }
 }
-
-func make_project_file(_ feature_name : String,_ file_path: String,_ has_demo : Bool = false,_ dependencies: [String] = []) {
+func make_project_file(_ project_name: String,
+                       _ file_path: String,
+                       _ has_demo: Bool = false,
+                       _ dependencies: [String] = []) {
     let project_path = file_path + "/Project.swift"
     let _ = file_path.split(separator: "/")
     let file_content = """
@@ -43,27 +42,23 @@ func make_project_file(_ feature_name : String,_ file_path: String,_ has_demo : 
     import ProjectDescriptionHelpers
     
     let project = Project.makeModule(
-        name: "\(feature_name)Feature",
+        name: "\(project_name)",
         product: .staticFramework,
         dependencies: [
-            .Project.Features.CommonFeature,
-        ],
-        \(has_demo ? "hasDemoApp: true" : "")
+        ]\(has_demo ? ",\n    hasDemoApp: true" : "")
     )
     """
     write_code_in_file(project_path, file_content)
 }
-
-func make_sources(_ feature_name: String) {
-    make_dir("\(feature_name)Feature/Sources")
-    let feature_file_path = "\(feature_name)Feature/Sources/\(feature_name)Feature.swift"
-    let feature_content = "// This is for tuist"
-    write_code_in_file(feature_file_path, feature_content)
+func make_sources(_ project_name: String) {
+    make_dir("\(project_name)/Sources")
+    let project_file_path = "\(project_name)/Sources/\(project_name).swift"
+    let project_content = "// This is for tuist"
+    write_code_in_file(project_file_path, project_content)
 }
-
-func make_tests(_ feature_name: String) {
-    make_dir("\(feature_name)Feature/Tests")
-    let test_file_path = "\(feature_name)Feature/Tests/TargetTests.swift"
+func make_tests(_ project_name: String) {
+    make_dir("\(project_name)/Tests")
+    let test_file_path = "\(project_name)/Tests/TargetTests.swift"
     let test_content = """
 import XCTest
 
@@ -80,16 +75,15 @@ class TargetTests: XCTestCase {
     func testExample() throws {
         XCTAssertEqual("A", "A")
     }
-
 }
 """
     write_code_in_file(test_file_path, test_content)
 }
-func make_demo(_ feature_name: String) {
-    make_dir("\(feature_name)Feature/Demo")
-    make_dir("\(feature_name)Feature/Demo/Sources")
-    make_dir("\(feature_name)Feature/Demo/Resources")
-    let launch_path = "\(feature_name)Feature/Demo/Resources/LaunchScreen.storyboard"
+func make_demo(_ project_name: String) {
+    make_dir("\(project_name)/Demo")
+    make_dir("\(project_name)/Demo/Sources")
+    make_dir("\(project_name)/Demo/Resources")
+    let launch_path = "\(project_name)/Demo/Resources/LaunchScreen.storyboard"
     let launch = """
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
     <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
@@ -120,7 +114,7 @@ func make_demo(_ feature_name: String) {
     
     write_code_in_file(launch_path, launch)
     
-    let app_delegate_path = "\(feature_name)Feature/Demo/Sources/AppDelegate.swift"
+    let app_delegate_path = "\(project_name)/Demo/Sources/AppDelegate.swift"
     let app_delegate = """
     @main
     class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -144,16 +138,19 @@ func make_demo(_ feature_name: String) {
     write_code_in_file(app_delegate_path, app_delegate)
 }
 
-print("Input new feature name : ", terminator: "")
-let feature_name : String = readLine()?.replacingOccurrences(of: "\n", with: "") ?? ""
+print("Input new project root \n(Features/Modules/Services/UserInterfaces, default = Features) : ", terminator: "")
+let root_path: String = readLint()?.replacingOccurrences(of: "\n", with: "") ?? ""
+let project_path = root_path.isEmpty ? "Features" : root_path
+
+print("Input new project name : ", terminator: "")
+let project_name : String = readLine()?.replacingOccurrences(of: "\n", with: "") ?? ""
 
 print("Include demo? (Y or N, default = N) : ", terminator: "")
 let has_demo : Bool = readLine()?.replacingOccurrences(of: "\n", with: "").uppercased() == "Y"
 
+print("Start to generate the new \(project_path.lowercased()) named \(project_name)...")
 
-print("Start to generate the new feature named \(feature_name)...")
-
-let current_path : String = "./Projects/Features/"
+let current_path : String = "./Projects/\(project_path)/"
 let fileManager : FileManager = .default
 
-make_new_feature(feature_name, has_demo)
+make_new_project(project_name, has_demo)

@@ -11,5 +11,5 @@ reset:
 	rm -rf **/*.xcodeproj
 	rm -rf *.xcworkspace
 
-feature:
-	swift Scripts/generate_new_feature.swift
+project:
+	swift Scripts/generate_new_project.swift
