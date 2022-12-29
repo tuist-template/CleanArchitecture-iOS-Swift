@@ -139,7 +139,7 @@ func make_demo(_ project_name: String) {
 }
 
 print("Input new project root \n(Features/Modules/Services/UserInterfaces, default = Features) : ", terminator: "")
-let root_path: String = readLint()?.replacingOccurrences(of: "\n", with: "") ?? ""
+let root_path: String = readLine()?.replacingOccurrences(of: "\n", with: "") ?? ""
 let project_path = root_path.isEmpty ? "Features" : root_path
 
 print("Input new project name : ", terminator: "")
